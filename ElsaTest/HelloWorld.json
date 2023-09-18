@@ -1,0 +1,47 @@
+{
+  "id": "HelloWorld-v123",
+  "definitionId": "HelloWorld",
+  "name": "Hello World",
+  "root": {
+    "id": "Flowchart1",
+    "type": "Elsa.Flowchart",
+    "activities": [
+      {
+        "id": "WriteLine1",
+        "type": "Elsa.WriteLine",
+        "text": {
+          "typeName": "String",
+          "expression": {
+            "type": "Literal",
+            "value": "Hello World! from Elsa.WriteLine"
+          },
+          "memoryReference": {
+            "id": "WriteLine1:input-1"
+          }
+        }
+      },
+      {
+        "id": "WriteLine4",
+        "type": "Elsa.WriteLine",
+        "text": {
+          "typeName": "String",
+          "expression": {
+            "type": "Literal",
+            "value": "Hello World!"
+          },
+          "memoryReference": {
+            "id": "WriteLine4:input-1"
+          }
+        }
+      },
+      {
+        "id": "WriteLine2",
+        "type": "GreeterPlugin.Greeter"
+      },
+      {
+        "id": "WriteLine3",
+        "type": "ElsaTest.GreeterLocal"
+      }
+    ]
+  }
+}

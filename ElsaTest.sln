@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElsaTest", "ElsaTest\ElsaTest.csproj", "{2D260FF0-89BB-4E33-A339-ED171DC2B317}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreeterPlugin", "GreeterPlugin\GreeterPlugin.csproj", "{8B760567-47D1-4BB3-8B60-1761669C3AB9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D260FF0-89BB-4E33-A339-ED171DC2B317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D260FF0-89BB-4E33-A339-ED171DC2B317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D260FF0-89BB-4E33-A339-ED171DC2B317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D260FF0-89BB-4E33-A339-ED171DC2B317}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B760567-47D1-4BB3-8B60-1761669C3AB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B760567-47D1-4BB3-8B60-1761669C3AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B760567-47D1-4BB3-8B60-1761669C3AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B760567-47D1-4BB3-8B60-1761669C3AB9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AFADC33A-8275-4059-B642-29741D0DDFCB}
+	EndGlobalSection
+EndGlobal
