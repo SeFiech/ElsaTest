@@ -14,14 +14,11 @@ var services = new ServiceCollection();
 
 string[] pluginPaths = new string[]
 {
-    @"GreeterPlugin\bin\Debug\net7.0\GreeterPlugin.dll",
-    //"c:\\temp\\greeterplugin.dll",
+    @"GreeterPlugin\bin\Debug\net7.0\GreeterPlugin.dll",    
 };
 
 
 string GetDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-//GetDirectory = "C:\\Temp";
 
 
 //IEnumerable<IActivity> activities = pluginPaths.SelectMany(pluginPaths =>
@@ -42,6 +39,7 @@ IEnumerable<Elsa.Workflows.Core.Models.ActivityDescriptor> activityDescribers = 
 
 // Local Activity 
 services.AddElsa(e => e.AddActivity<GreeterLocal>());
+//services.AddElsa();
 
 
 // Build service container.
@@ -50,6 +48,7 @@ var serviceProvider = services.BuildServiceProvider();
 
 // Populate registries. This is only necessary for applications  that are not using hosted services.
 await serviceProvider.PopulateRegistriesAsync();
+
 
 // Import a workflow from a JSON file.
 Console.WriteLine($"Load JSON File from {GetDirectory}\\HelloWorld.json");
