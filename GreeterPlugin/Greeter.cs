@@ -1,6 +1,4 @@
-﻿using Elsa.Extensions;
-using Elsa.Workflows.Core;
-using Elsa.Workflows.Core.Models;
+﻿using Elsa.Workflows.Core;
 
 namespace GreeterPlugin
 {
@@ -8,7 +6,7 @@ namespace GreeterPlugin
     {
         protected override void Execute(ActivityExecutionContext context)
         {
-            Console.WriteLine("Hello, world! from Greeter external");
-        }
+            Console.WriteLine("Hello World! from Greeter external");
+        }       
     }
 }

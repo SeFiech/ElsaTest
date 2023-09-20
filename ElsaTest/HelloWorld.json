@@ -21,26 +21,34 @@
         }
       },
       {
-        "id": "WriteLine4",
-        "type": "Elsa.WriteLine",
-        "text": {
-          "typeName": "String",
-          "expression": {
-            "type": "Literal",
-            "value": "Hello World!"
-          },
-          "memoryReference": {
-            "id": "WriteLine4:input-1"
-          }
-        }
-      },
-      {
         "id": "WriteLine2",
-        "type": "GreeterPlugin.Greeter"
+        "type": "ElsaTest.GreeterLocal"
       },
       {
         "id": "WriteLine3",
-        "type": "ElsaTest.GreeterLocal"
+        "type": "GreeterPlugin.Greeter"
+      }
+    ],
+    "connections": [
+      {
+        "source": {
+          "activity": "WriteLine1",
+          "port": "Done"
+        },
+        "target": {
+          "activity": "WriteLine2",
+          "port": "In"
+        }
+      },
+      {
+        "source": {
+          "activity": "WriteLine2",
+          "port": "Done"
+        },
+        "target": {
+          "activity": "WriteLine3",
+          "port": "In"
+        }
       }
     ]
   }

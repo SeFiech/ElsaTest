@@ -4,7 +4,6 @@ using Elsa.Workflows.Core.Activities;
 using Elsa.Workflows.Core.Contracts;
 using Elsa.Workflows.Core.Models;
 using ElsaTest;
-using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -21,26 +20,8 @@ string[] pluginPaths = new string[]
 string GetDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
 
-//IEnumerable<IActivity> activities = pluginPaths.SelectMany(pluginPaths =>
-//{
-//    Assembly pluginAssembly = LoadPlugin(pluginPaths);
-//    return CreateActivity(pluginAssembly);
-//}).ToList();
-//IActivity test = activities.First();
-
-
-IEnumerable<Elsa.Workflows.Core.Models.ActivityDescriptor> activityDescribers = pluginPaths.SelectMany(pluginPaths =>
-{
-    Assembly pluginAssembly = LoadPlugin(pluginPaths);
-    return CreateActivityDescription(pluginAssembly);
-}).ToList();
-
-
-
-// Local Activity 
+// Local Activity with the local Custom Activity
 services.AddElsa(e => e.AddActivity<GreeterLocal>());
-//services.AddElsa();
-
 
 // Build service container.
 var serviceProvider = services.BuildServiceProvider();
@@ -58,63 +39,21 @@ var workflowJson = await File.ReadAllTextAsync(GetDirectory + "\\HelloWorld.json
 // Get a serializer to deserialize the workflow.
 var serializer = serviceProvider.GetRequiredService<IActivitySerializer>();
 
-// Deserialize the workflow.
-var workflow = serializer.Deserialize<Workflow>(workflowJson);
 
-
-
-
-// Resolve a workflow runner to run the workflow.
-var workflowRunner = serviceProvider.GetRequiredService<IWorkflowRunner>();
-
-//foreach (var activity in activities)
-//{
-//    ActivityFactory activityFactory = new();
-
-
-//    ActivityDescriptor ad = new ActivityDescriptor
-//    {
-//        TypeName = activity.GetType().FullName,
-//        Namespace = activity.GetType().Namespace,
-//        DisplayName = activity.GetType().Name.Humanize(),
-//        Category = "Console",
-//        Name = activity.GetType().Name,
-//        Version = activity.Version,
-
-//        Constructor = context => {
-//            return activity;
-//        }
-
-//        //Constructor =
-//        //{
-//        //    return activity.
-//        //}
-//        //Constructor = context =>
-//        //{
-//        //    //var act2 =  activityFactory.Create(activity.GetType(),context);
-//        //    //act2.Type = activity.GetType().FullName;
-//        //    //act2.ExecuteAsync = activity.ExecuteAsync();
-
-//        //    return activity;
-//        //}
-
-
-//    };
-//    //ad.Name = activity.Type.ToString();   
-
-
-//    activityRegistry.Register(ad);
-//    activityRegistry.
-//    ActivityDescriptor activityDescriptor = activityRegistry.Find("ElsaTest.GreeterLocal");
-//    //ActivityDescriptor activityDescriptor = activityRegistry.Find("GreeterPlugin.Greeter");
-//    var temp = activityDescriptor.Constructor.Target;
-
-//}
-
-
+// IMPORTANT! Before loading the workflow, we need to register the activity types.
 var activityRegistry = serviceProvider.GetRequiredService<IActivityRegistry>();
+var activityDescriber = serviceProvider.GetRequiredService<IActivityDescriber>();
 
-foreach (ActivityDescriptor actdesc in activityDescribers)
+var activityDescriptorTasks = pluginPaths.Select(async pluginPaths =>
+{
+    var pluginAssembly = LoadPlugin(pluginPaths);
+    return await CreateActivityDescription(pluginAssembly, activityDescriber);
+}).ToList();
+
+var activityDescriptors = (await Task.WhenAll(activityDescriptorTasks)).SelectMany(x => x).ToList();
+
+
+foreach (ActivityDescriptor actdesc in activityDescriptors)
 {
     //activityRegistry.Clear();
     //activityRegistry.Add(typeof(IActivityDescriber), actdesc);
@@ -123,6 +62,15 @@ foreach (ActivityDescriptor actdesc in activityDescribers)
 
 
 var act = activityRegistry.ListAll();
+
+
+
+// Deserialize the workflow.
+var workflow = serializer.Deserialize<Workflow>(workflowJson);
+
+
+// Resolve a workflow runner to run the workflow.
+var workflowRunner = serviceProvider.GetRequiredService<IWorkflowRunner>();
 
 
 // Run the workflow.
@@ -150,72 +98,27 @@ static Assembly LoadPlugin(string relativePath)
 
 
 
-// Create IActivity from Assembly
-static IEnumerable<IActivity> CreateActivity(Assembly assembly)
-{
-    int count = 0;
-
-    foreach (Type type in assembly.GetTypes())
-    {
-        if (typeof(IActivity).IsAssignableFrom(type))
-        {
-            IActivity? result = Activator.CreateInstance(type) as IActivity;
-            if (result != null)
-            {
-                count++;
-                yield return result;
-            }
-        }
-    }
-
-    if (count == 0)
-    {
-        string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
-        throw new ApplicationException(
-            $"Can't find any type which implement IActivity in {assembly} from {assembly.Location}.\n" +
-            $"Available types: {availableTypes}");
-    }
-}
-
-
 // Create ActivityDescriptor from Assembly
-static IEnumerable<Elsa.Workflows.Core.Models.ActivityDescriptor> CreateActivityDescription(Assembly assembly)
+static async Task<IEnumerable<ActivityDescriptor>> CreateActivityDescription(Assembly assembly, IActivityDescriber describer)
 {
-    int count = 0;
+    var descriptors = new List<ActivityDescriptor>();
 
     foreach (Type type in assembly.GetTypes())
     {
         if (typeof(IActivity).IsAssignableFrom(type))
-        {
-            ActivityDescriptor ad = new ActivityDescriptor
-            {
-                TypeName = type.FullName,
-                Namespace = type.Namespace,
-                DisplayName = type.Name.Humanize(),
-                Category = "Console",
-                Name = type.Name,
-                Version = 1,
-
-                Constructor = context => {
-                    var ac = Activator.CreateInstance(type) as IActivity;
-                    return ac;
-                },                                
-            };
-            
-            if (ad != null)
-            {
-                count++;                
-            }
-
-            yield return ad;
+        {            
+            var ad = await describer.DescribeActivityAsync(type);
+            descriptors.Add(ad);
         }
     }
 
-    if (count == 0)
+    if (!descriptors.Any())
     {
         string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
         throw new ApplicationException(
             $"Can't find any type which implement IActivity in {assembly} from {assembly.Location}.\n" +
             $"Available types: {availableTypes}");
     }
+
+    return descriptors;
 }

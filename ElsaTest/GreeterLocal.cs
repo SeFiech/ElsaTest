@@ -6,7 +6,7 @@ namespace ElsaTest
     {
         protected override void Execute(ActivityExecutionContext context)
         {
-            Console.WriteLine("Hello, world from GreeterLocal");
+            Console.WriteLine("Hello World! from GreeterLocal");
         }
     }
 }
